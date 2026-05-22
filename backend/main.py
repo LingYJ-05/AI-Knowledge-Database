@@ -1,0 +1,158 @@
+import os
+
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"  # 也禁用 tokenizers 的并行处理
+
+# FastAPI 启动入口
+import sys
+from contextlib import asynccontextmanager
+from datetime import datetime  # 新增: 用于健康检查端点返回当前时间
+
+import uvicorn
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+# 将当前目录添加到Python路径，确保可以导入同级模块
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+# 导入配置和路由模块
+from api import routes as api_routes
+from services.embedding import get_embedding_model  # 用于预加载
+from services.vector_store import get_vector_store  # 用于预加载
+
+# 应用标题和版本，会显示在 Swagger UI
+APP_TITLE = "RAG Enterprise Q&A Assistant API"
+APP_VERSION = "0.1.0"
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """应用生命周期管理"""
+    # 启动时执行
+    print("FastAPI 应用启动中...")
+
+    # 初始化数据库表
+    try:
+        print("正在初始化数据库...")
+        import sqlite3
+
+        from database import DB_PATH, create_tables
+
+        create_tables()
+        print("数据库表已创建。")
+
+        # 验证表是否创建成功
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        tables = cursor.fetchall()
+        print(f"数据库中的表: {tables}")
+        conn.close()
+    except Exception as e:
+        print(f"启动时创建数据库表失败: {e}")
+
+    # 预加载嵌入模型和向量数据库
+    try:
+        print("正在初始化/加载嵌入模型...")
+        get_embedding_model()
+        print("嵌入模型已准备就绪。")
+    except Exception as e:
+        print(f"启动时加载嵌入模型失败: {e}")
+
+    try:
+        print("正在初始化/加载向量数据库...")
+        get_vector_store()
+        print("向量数据库已准备就绪。")
+    except Exception as e:
+        print(f"启动时加载向量数据库失败: {e}")
+
+    print("FastAPI 应用启动完成。")
+
+    yield
+
+    # 关闭时执行
+    print("FastAPI 应用关闭中...")
+    print("FastAPI 应用已关闭。")
+
+
+app = FastAPI(
+    title=APP_TITLE,
+    version=APP_VERSION,
+    description="基于 FastAPI 的 RAG 企业知识库问答系统后端 API",
+    lifespan=lifespan,
+)
+
+# 更直接的CORS处理方式，通过自定义中间件为所有响应添加CORS头
+
+# 移除重复的CORS中间件和OPTIONS处理程序，统一使用FastAPI的标准CORSMiddleware
+
+# 使用标准的CORS中间件处理所有跨域请求
+# 使用环境变量来设置允许的源域名
+default_origins = [
+    "https://enterprise-knowledge-hub.vercel.app",  # Vercel前端
+    "https://ragsys.vercel.app",  # Vercel前端
+    "http://localhost:3004",  # 本地开发环境
+    "http://127.0.0.1:3004",  # 本地开发环境
+]
+
+# 从环境变量中获取CORS配置
+cors_env = os.environ.get("CORS_ORIGINS", "")
+if cors_env:
+    # 使用环境变量设置的域名列表（逗号分隔）
+    origins = cors_env.split(",")
+    print(f"[从环境变量读取CORS域名] {origins}")
+else:
+    # 使用默认列表
+    origins = default_origins
+    print(f"[使用默认CORS域名] {origins}")
+
+# 添加特殊配置，添加"*"来允许所有源（开发时使用）
+if "*" in origins:
+    print("警告: 开启了允许所有源的CORS访问")
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=False,
+        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allow_headers=["*"],
+        max_age=86400,
+    )
+else:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allow_headers=["*"],
+        max_age=86400,
+    )
+
+# 包含 API 路由
+# 可以为 API 路由添加统一的前缀，例如 /api/v1
+app.include_router(api_routes.router, prefix="/api")
+
+
+# 健康检查端点 - 用于保活机制
+@app.get("/api/health")
+async def health_check():
+    """健康检查端点，返回当前状态和时间戳，用于保活"""
+    return {
+        "status": "ok",
+        "version": APP_VERSION,
+        "timestamp": datetime.now().isoformat(),
+        "environment": "production" if os.getenv("RENDER") else "development",
+    }
+
+
+# 主运行块，用于直接通过 python main.py 启动 (主要用于开发)
+if __name__ == "__main__":
+    # 从环境变量获取端口，如果未设置则默认为 8000
+    # Uvicorn 的 --port 参数会覆盖这里的 host 和 port
+    port = int(os.getenv("BACKEND_PORT", "8004"))
+    host = os.getenv("BACKEND_HOST", "0.0.0.0")  # 默认监听所有网络接口，确保外部可访问
+
+    print(f"准备在 {host}:{port} 启动 Uvicorn 服务器...")
+    uvicorn.run(
+        "main:app", host=host, port=port, reload=False, app_dir=".", loop="uvloop"
+    )

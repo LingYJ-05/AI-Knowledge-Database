@@ -1,0 +1,80 @@
+@import './styles/markdown.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 12.5%;
+  --muted: 0 0% 95%;
+  --muted-foreground: 0 0% 39%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 12.5%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 12.5%;
+  --border: 0 0% 85%;
+  --input: 0 0% 85%;
+  --primary: 10 92% 46%;
+  --primary-foreground: 0 0% 99%;
+  --secondary: 0 0% 96%;
+  --secondary-foreground: 0 0% 12.5%;
+  --accent: 0 0% 96%;
+  --accent-foreground: 0 0% 12.5%;
+  --destructive: 10 92% 46%;
+  --destructive-foreground: 0 0% 98%;
+  --ring: 10 92% 46%;
+  --radius: 9999px;
+
+  --replicate-dark: #202020;
+  --replicate-red: #ea2804;
+  --replicate-secondary-red: #dd4425;
+  --status-green: #2b9a66;
+  --warm-gray: #4e4e4e;
+  --medium-gray: #646464;
+  --mid-silver: #8d8d8d;
+  --light-silver: #bbbbbb;
+  --code-bg: #24292e;
+}
+
+.dark {
+  --background: 0 0% 12.5%;
+  --foreground: 0 0% 98%;
+  --muted: 0 0% 20%;
+  --muted-foreground: 0 0% 64%;
+  --popover: 0 0% 12.5%;
+  --popover-foreground: 0 0% 98%;
+  --card: 0 0% 12.5%;
+  --card-foreground: 0 0% 98%;
+  --border: 0 0% 20%;
+  --input: 0 0% 20%;
+  --primary: 10 92% 46%;
+  --primary-foreground: 0 0% 99%;
+  --secondary: 0 0% 20%;
+  --secondary-foreground: 0 0% 98%;
+  --accent: 0 0% 20%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --ring: 0 0% 60%;
+  --radius: 9999px;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply antialiased bg-background text-foreground;
+    font-family: 'DM Sans', 'Noto Sans SC', ui-sans-serif, system-ui, sans-serif;
+  }
+
+  a {
+    text-decoration: underline dotted #bbbbbb;
+    text-underline-offset: 3px;
+  }
+  a:hover {
+    text-decoration-color: #202020;
+  }
+}

@@ -1,0 +1,99 @@
+# Node.js and frontend
+node_modules/
+dist/
+.DS_Store
+# vite.config.ts.* # It seems this was to ignore temp files from vite, might not be needed if specific
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+/lib/  # 仅忽略根目录下的lib目录
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# IDE specific files
+.idea/
+.vscode/
+*.suo
+*.ntvs*.*
+*.njsproj
+*.sln
+*.sw?
+.cursor/
+.claude/
+.trae/
+
+# Environment files
+.env
+.env.*
+!.env.example
+!backend/.env.example
+
+# Data and Index files
+index/faiss_store.index
+index/faiss_store.meta.pkl
+data/
+uploads/
+backend/data/uploaded_files/
+backend/index/
+
+# Database files
+*.db
+app.db
+backend/app.db
+
+# Log files
+*.log
+backend_log.txt
+
+# Test files
+test_*.py
+test-*.html
+test*.pdf
+
+# Temporary files
+*.tmp
+*.temp
+generated-icon.png
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Deployment files  
+railway-config.txt
+render.yaml
+
+.ruff_cache/
+
+# Skill directory
+skill/
+awesome-design-md/
+.trae/
+
+# claude
+.CLAUDE/
+CLAUDE.md
