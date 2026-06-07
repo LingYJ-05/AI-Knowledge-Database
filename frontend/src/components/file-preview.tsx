@@ -1,39 +1,37 @@
 import { useState } from "react";
 import { FileText, AlertCircle } from "lucide-react";
-import { DocumentMetadata } from "@/lib/api";
 import { getApiBaseUrl } from "@/lib/queryClient";
 
-interface FilePreviewProps {
-  selectedFile: DocumentMetadata | null;
-  onClose?: () => void;
-}
-
-export default function FilePreview({ selectedFile, onClose }: FilePreviewProps) {
+export default function FilePreview({ selectedFile }) {
   const [previewError, setPreviewError] = useState(false);
 
   if (!selectedFile) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-white">
+      <div className="h-full flex items-center justify-center bg-[#fafaf7]">
         <div className="text-center">
-          <FileText className="h-16 w-16 text-[#bbbbbb] mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-[#202020] mb-2">选择文档预览</h3>
-          <p className="text-[#8d8d8d]">点击左侧文档库中的文件进行预览</p>
+          <div className="w-16 h-16 bg-white border border-[#e6e5e0] rounded-lg flex items-center justify-center mx-auto mb-4">
+            <FileText className="w-8 h-8 text-[#807d72]" />
+          </div>
+          <h3 className="text-sm font-medium text-[#262520] mb-1">选择文档预览</h3>
+          <p className="text-xs text-[#807d72]">点击左侧文档库中的文件进行预览</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-white">
-      <div className="flex-1 overflow-hidden bg-white">
-        {selectedFile.filename.toLowerCase().endsWith('.pdf') ? (
+    <div className="h-full flex flex-col bg-white">
+      <div className="flex-1 overflow-hidden">
+        {selectedFile.filename.toLowerCase().endsWith(".pdf") ? (
           <div className="h-full bg-white">
             {previewError ? (
-              <div className="flex items-center justify-center h-full">
+              <div className="flex items-center justify-center h-full bg-[#fafaf7]">
                 <div className="text-center">
-                  <AlertCircle className="h-16 w-16 text-[#bbbbbb] mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-[#202020] mb-2">无法预览文件</h3>
-                  <p className="text-[#8d8d8d]">此文件类型暂不支持在线预览</p>
+                  <div className="w-16 h-16 bg-white border border-[#e6e5e0] rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <AlertCircle className="w-8 h-8 text-[#807d72]" />
+                  </div>
+                  <h3 className="text-sm font-medium text-[#262520] mb-1">无法预览文件</h3>
+                  <p className="text-xs text-[#807d72]">此文件类型暂不支持在线预览</p>
                 </div>
               </div>
             ) : (
@@ -46,11 +44,13 @@ export default function FilePreview({ selectedFile, onClose }: FilePreviewProps)
             )}
           </div>
         ) : (
-          <div className="flex items-center justify-center h-full">
+          <div className="flex items-center justify-center h-full bg-[#fafaf7]">
             <div className="text-center">
-              <FileText className="h-16 w-16 text-[#bbbbbb] mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-[#202020] mb-2">文件预览</h3>
-              <p className="text-[#8d8d8d]">此文件类型暂不支持在线预览</p>
+              <div className="w-16 h-16 bg-white border border-[#e6e5e0] rounded-lg flex items-center justify-center mx-auto mb-4">
+                <FileText className="w-8 h-8 text-[#807d72]" />
+              </div>
+              <h3 className="text-sm font-medium text-[#262520] mb-1">文件预览</h3>
+              <p className="text-xs text-[#807d72]">此文件类型暂不支持在线预览</p>
             </div>
           </div>
         )}

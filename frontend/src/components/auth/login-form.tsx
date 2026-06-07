@@ -1,15 +1,21 @@
 /**
  * 登录表单组件
  */
-import React, { useState, useRef, useEffect } from 'react';
-import { useAuth } from '@/contexts/auth-context';
-import { useLocation } from 'wouter';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Eye, EyeOff, LogIn } from 'lucide-react';
+import React, { useState, useRef, useEffect } from "react";
+import { useAuth } from "@/contexts/auth-context";
+import { useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Eye, EyeOff, LogIn } from "lucide-react";
 
 interface LoginFormProps {
   onSwitchToRegister: () => void;
@@ -19,8 +25,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
   const { login, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,57 +37,58 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
   // 监听认证状态变化，登录成功后自动跳转
   useEffect(() => {
     if (loginSuccess && isAuthenticated) {
-      console.log('认证状态已更新，执行跳转...');
-      setLocation('/app');
+      console.log("认证状态已更新，执行跳转...");
+      setLocation("/app");
     }
   }, [isAuthenticated, loginSuccess, setLocation]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // 使用 ref 进行更强的防抖保护
     if (submittingRef.current || isSubmitting) {
-      console.log('防止重复提交，当前状态:', { submittingRef: submittingRef.current, isSubmitting });
+      console.log("防止重复提交，当前状态:", {
+        submittingRef: submittingRef.current,
+        isSubmitting,
+      });
       return;
     }
-    
+
     // 基础表单验证
     if (!formData.email || !formData.password) {
-      setError('请填写完整的登录信息');
+      setError("请填写完整的登录信息");
       return;
     }
-    
-    console.log('开始登录流程...');
+
+    console.log("开始登录流程...");
     submittingRef.current = true;
     setIsSubmitting(true);
     setError(null);
 
     try {
       await login(formData);
-      console.log('登录成功，等待认证状态更新...');
+      console.log("登录成功，等待认证状态更新...");
       setLoginSuccess(true);
     } catch (err) {
-      console.error('登录失败:', err);
-      setError(err instanceof Error ? err.message : '登录失败，请重试');
+      console.error("登录失败:", err);
+      setError(err instanceof Error ? err.message : "登录失败，请重试");
     } finally {
       submittingRef.current = false;
       setIsSubmitting(false);
-      console.log('登录流程结束');
+      console.log("登录流程结束");
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold">登录</CardTitle>
-        <CardDescription>
-          登录您的账户以访问 DocPal
-        </CardDescription>
+        <CardDescription>登录您的账户以访问 MindFlow</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -90,7 +97,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-          
+
           <div className="space-y-2">
             <Label htmlFor="email">邮箱</Label>
             <Input
@@ -111,7 +118,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
               <Input
                 id="password"
                 name="password"
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 placeholder="输入您的密码"
                 value={formData.password}
                 onChange={handleChange}
@@ -148,7 +155,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
         </form>
 
         <div className="mt-4 text-center text-sm text-[#646464]">
-          还没有账户？{' '}
+          还没有账户？{" "}
           <button
             onClick={onSwitchToRegister}
             className="text-[#ea2804] font-medium"

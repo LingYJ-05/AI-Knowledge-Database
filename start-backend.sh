@@ -3,7 +3,7 @@
 # 后端启动脚本
 # 启动 FastAPI 后端服务
 
-echo "🚀 启动 DocPal 后端服务..."
+echo "🚀 启动 MindFlow 后端服务..."
 
 # 切换到后端目录
 cd backend
@@ -21,7 +21,7 @@ PYTHON=".venv/bin/python"
 UVICORN=".venv/bin/uvicorn"
 
 # 设置环境变量
-export BACKEND_PORT=8004
+export BACKEND_PORT=3004
 export BACKEND_HOST=0.0.0.0
 
 echo "🔧 环境配置:"

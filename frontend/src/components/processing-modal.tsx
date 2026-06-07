@@ -76,7 +76,7 @@ export default function ProcessingModal({ isOpen, onClose }: ProcessingModalProp
     if (processingDocuments.length === 0) {
       return (
         <div className="text-center py-4">
-          <p className="text-[#646464]">当前没有正在处理的文档。</p>
+          <p className="text-[#807d72]">当前没有正在处理的文档。</p>
         </div>
       );
     }
@@ -87,7 +87,7 @@ export default function ProcessingModal({ isOpen, onClose }: ProcessingModalProp
       <div className="space-y-4">
         <div>
           <div className="flex justify-between text-sm mb-1">
-            <span className="font-medium text-[#202020]">文本提取</span>
+            <span className="font-medium text-[#262520]">文本提取</span>
             <StatusLabel status={getStepStatus("extracting", document)} />
           </div>
           <Progress value={getStepStatus("extracting", document).progress} className="h-1.5" />
@@ -95,7 +95,7 @@ export default function ProcessingModal({ isOpen, onClose }: ProcessingModalProp
 
         <div>
           <div className="flex justify-between text-sm mb-1">
-            <span className="font-medium text-[#202020]">文本分块与清洗</span>
+            <span className="font-medium text-[#262520]">文本分块与清洗</span>
             <StatusLabel status={getStepStatus("chunking", document)} />
           </div>
           <Progress value={getStepStatus("chunking", document).progress} className="h-1.5" />
@@ -103,7 +103,7 @@ export default function ProcessingModal({ isOpen, onClose }: ProcessingModalProp
 
         <div>
           <div className="flex justify-between text-sm mb-1">
-            <span className="font-medium text-[#202020]">向量嵌入</span>
+            <span className="font-medium text-[#262520]">向量嵌入</span>
             <StatusLabel status={getStepStatus("embedding", document)} />
           </div>
           <Progress value={getStepStatus("embedding", document).progress} className="h-1.5" />
@@ -111,7 +111,7 @@ export default function ProcessingModal({ isOpen, onClose }: ProcessingModalProp
 
         <div>
           <div className="flex justify-between text-sm mb-1">
-            <span className="font-medium text-[#202020]">建立索引</span>
+            <span className="font-medium text-[#262520]">建立索引</span>
             <StatusLabel status={getStepStatus("indexing", document)} />
           </div>
           <Progress value={getStepStatus("indexing", document).progress} className="h-1.5" />
@@ -122,13 +122,13 @@ export default function ProcessingModal({ isOpen, onClose }: ProcessingModalProp
 
   return (
     <Dialog open={isOpen} onOpenChange={canClose ? onClose : undefined}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-white border border-[#e6e5e0]">
         <DialogHeader>
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#ea2804]/10 flex items-center justify-center">
-            <Cog className="text-[#ea2804] h-8 w-8 animate-pulse" />
+          <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-[#f54e00]/10 flex items-center justify-center">
+            <Cog className="text-[#f54e00] h-8 w-8 animate-pulse" />
           </div>
-          <DialogTitle className="text-center text-[#202020]">文档处理中</DialogTitle>
-          <p className="text-center text-[#646464] text-sm mt-1">
+          <DialogTitle className="text-center text-[#262520] font-normal">文档处理中</DialogTitle>
+          <p className="text-center text-[#807d72] text-sm mt-1">
             根据文档大小，这可能需要几分钟时间
           </p>
         </DialogHeader>
@@ -136,10 +136,10 @@ export default function ProcessingModal({ isOpen, onClose }: ProcessingModalProp
         {renderProcessingSteps()}
 
         <DialogFooter className="mt-6 flex justify-between">
-          <Button variant="outline" onClick={onClose} disabled={!canClose}>
+          <Button variant="outline" onClick={onClose} disabled={!canClose} className="bg-white border-[#e6e5e0] text-[#262520] hover:bg-[#e6e5e0]/30 hover:border-[#e6e5e0] rounded-lg">
             取消
           </Button>
-          <Button onClick={onClose} disabled={!canClose}>
+          <Button onClick={onClose} disabled={!canClose} className="bg-[#262520] hover:bg-[#262520]/90 text-white rounded-lg">
             {canClose ? "关闭" : "处理中..."}
           </Button>
         </DialogFooter>
@@ -165,8 +165,8 @@ function StatusLabel({ status }: StatusLabelProps) {
   }
 
   if (status.status === "processing") {
-    return <span className="text-[#202020]">{status.progress}%</span>;
+    return <span className="text-[#262520]">{status.progress}%</span>;
   }
 
-  return <span className="text-[#8d8d8d]">等待中...</span>;
+  return <span className="text-[#807d72]">等待中...</span>
 }

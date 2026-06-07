@@ -3,7 +3,7 @@
 # 前端启动脚本
 # 启动 Vite + React 前端服务
 
-echo "🚀 启动 DocPal 前端服务..."
+echo "🚀 启动 MindFlow 前端服务..."
 
 # 切换到前端目录
 cd frontend

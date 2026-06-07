@@ -1,4 +1,4 @@
-@import './styles/markdown.css';
+@import "./styles/markdown.css";
 
 @tailwind base;
 @tailwind components;
@@ -67,7 +67,8 @@
 
   body {
     @apply antialiased bg-background text-foreground;
-    font-family: 'DM Sans', 'Noto Sans SC', ui-sans-serif, system-ui, sans-serif;
+    font-family:
+      "DM Sans", "Noto Sans SC", ui-sans-serif, system-ui, sans-serif;
   }
 
   a {

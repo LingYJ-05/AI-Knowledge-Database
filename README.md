@@ -75,7 +75,7 @@ cd AI-Knowledge-Database
 
 ### 2. 后端启动
 
-```bash
+````bash
 cd backend
 python -m venv .venv
 .venv\Scripts\activate
@@ -86,7 +86,7 @@ python -m venv .venv
 cd frontend
 npm install
 npm run dev
-```
+````
 
 访问：http://localhost:5173
 

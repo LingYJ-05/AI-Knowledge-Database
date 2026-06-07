@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { api, StreamChunk } from "@/lib/api";
 import { queryClient } from "@/lib/queryClient";
-import { Message } from "@shared/schema";
+import { Message } from "@/shared/schema";
 
 export function useChat() {
   // 本地消息存储

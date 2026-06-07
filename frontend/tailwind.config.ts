@@ -67,7 +67,7 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        mindflow: {
+        MindFlow: {
           primary: "#6366f1",
           "primary-glow": "#818cf8",
           secondary: "#ec4899",

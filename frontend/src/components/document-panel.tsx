@@ -4,33 +4,28 @@ import { Input } from "@/components/ui/input";
 import { useDocuments } from "@/hooks/use-documents";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, RefreshCw, Trash2, Upload, Search, Database, FileText, FolderOpen, ChevronRight, ChevronDown, Folder, File } from "lucide-react";
+import {
+  Loader2,
+  RefreshCw,
+  Trash2,
+  Upload,
+  Search,
+  FileText,
+  ChevronRight,
+  ChevronDown,
+  File,
+} from "lucide-react";
 import { queryClient, getApiBaseUrl } from "@/lib/queryClient";
-import { DocumentMetadata } from "@/lib/api";
 
-interface DocumentCategory {
-  id: string;
-  name: string;
-  icon: React.ReactNode;
-  documents: DocumentMetadata[];
-  expanded?: boolean;
-}
-
-interface DocumentPanelProps {
-  onFileSelect?: (file: DocumentMetadata) => void;
-  selectedFile?: DocumentMetadata | null;
-}
-
-export default function DocumentPanel({ onFileSelect, selectedFile }: DocumentPanelProps) {
+export default function DocumentPanel({ onFileSelect, selectedFile }) {
   const { toast } = useToast();
-  const { documents, isLoading, refetch, totalDocuments, lastUpdated } = useDocuments();
+  const { documents, isLoading, refetch } = useDocuments();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['all']));
 
-  const uploadFiles = async (files: FileList) => {
+  const uploadFiles = async (files) => {
     setIsUploading(true);
 
     try {
@@ -39,12 +34,16 @@ export default function DocumentPanel({ onFileSelect, selectedFile }: DocumentPa
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
 
-        const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+        const validTypes = [
+          "application/pdf",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "text/plain",
+        ];
         if (!validTypes.includes(file.type)) {
           toast({
             title: "文件类型无效",
             description: `${file.name} 不是支持的文件类型，仅支持PDF、DOCX和TXT文件`,
-            variant: "destructive"
+            variant: "destructive",
           });
           continue;
         }
@@ -54,14 +53,14 @@ export default function DocumentPanel({ onFileSelect, selectedFile }: DocumentPa
           toast({
             title: "文件太大",
             description: `${file.name} 超过100MB限制`,
-            variant: "destructive"
+            variant: "destructive",
           });
           continue;
         }
 
         toast({
           title: `上传中 (${i + 1}/${files.length})`,
-          description: `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`
+          description: `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`,
         });
 
         const formData = new FormData();
@@ -71,7 +70,7 @@ export default function DocumentPanel({ onFileSelect, selectedFile }: DocumentPa
         const response = await fetch(uploadUrl, {
           method: "POST",
           body: formData,
-          credentials: 'omit'
+          credentials: "omit",
         });
 
         if (!response.ok) {
@@ -81,20 +80,23 @@ export default function DocumentPanel({ onFileSelect, selectedFile }: DocumentPa
         console.log(`文件 ${file.name} 上传成功`);
       }
 
-      queryClient.invalidateQueries({ queryKey: [`${baseApiUrl}/api/documents`] });
-      queryClient.invalidateQueries({ queryKey: [`${baseApiUrl}/api/vector_store_size`] });
+      queryClient.invalidateQueries({
+        queryKey: [`${baseApiUrl}/api/documents`],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [`${baseApiUrl}/api/vector_store_size`],
+      });
 
       toast({
         title: "上传成功",
-        description: "文档已上传并正在处理中"
+        description: "文档已上传并正在处理中",
       });
-
     } catch (error) {
       console.error("Upload error:", error);
       toast({
         title: "上传失败",
         description: error instanceof Error ? error.message : "无法上传文档",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setIsUploading(false);
@@ -102,12 +104,12 @@ export default function DocumentPanel({ onFileSelect, selectedFile }: DocumentPa
   };
 
   const handleUploadClick = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
+    const input = document.createElement("input");
+    input.type = "file";
     input.multiple = true;
-    input.accept = '.pdf,.docx,.doc,.txt';
+    input.accept = ".pdf,.docx,.doc,.txt";
     input.onchange = (e) => {
-      const target = e.target as HTMLInputElement;
+      const target = e.target;
       if (target.files && target.files.length > 0) {
         uploadFiles(target.files);
       }
@@ -122,13 +124,13 @@ export default function DocumentPanel({ onFileSelect, selectedFile }: DocumentPa
       await refetch();
       toast({
         title: "索引已刷新",
-        description: "知识库已成功刷新。"
+        description: "知识库已成功刷新。",
       });
     } catch (error) {
       toast({
         title: "刷新失败",
         description: "无法刷新知识库。请重试。",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setIsRefreshing(false);
@@ -143,228 +145,181 @@ export default function DocumentPanel({ onFileSelect, selectedFile }: DocumentPa
     try {
       setIsClearing(true);
       await apiRequest("DELETE", "/api/reset_vector_store", {});
-      queryClient.invalidateQueries({ queryKey: [`${getApiBaseUrl()}/api/vector_store_size`] });
-      queryClient.invalidateQueries({ queryKey: [`${getApiBaseUrl()}/api/documents`] });
+      queryClient.invalidateQueries({
+        queryKey: [`${getApiBaseUrl()}/api/vector_store_size`],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [`${getApiBaseUrl()}/api/documents`],
+      });
       toast({
         title: "知识库已清空",
-        description: "所有文档已从知识库中移除。"
+        description: "所有文档已从知识库中移除。",
       });
     } catch (error) {
       toast({
         title: "清空失败",
         description: "无法清空知识库。请重试。",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setIsClearing(false);
     }
   };
 
-  const categorizeDocuments = (): DocumentCategory[] => {
-    const categories: DocumentCategory[] = [
-      {
-        id: 'all',
-        name: '文档库',
-        icon: <Database className="h-4 w-4" />,
-        documents: documents.filter(doc => doc.filename.toLowerCase().includes(searchQuery.toLowerCase())),
-        expanded: true
-      },
-      {
-        id: 'reports',
-        name: '技术文档',
-        icon: <FileText className="h-4 w-4" />,
-        documents: documents.filter(doc =>
-          (doc.filename.includes('报告') || doc.filename.includes('.md')) &&
-          doc.filename.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      },
-      {
-        id: 'operations',
-        name: '运营资料',
-        icon: <Folder className="h-4 w-4" />,
-        documents: documents.filter(doc =>
-          (doc.filename.includes('运营') || doc.filename.includes('策略')) &&
-          doc.filename.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      },
-      {
-        id: 'meetings',
-        name: '会议纪要',
-        icon: <FolderOpen className="h-4 w-4" />,
-        documents: documents.filter(doc =>
-          doc.filename.includes('会议') &&
-          doc.filename.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      }
-    ];
+  const filteredDocuments = documents.filter((doc) =>
+    doc.filename.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
-    return categories.filter(cat => cat.documents.length > 0 || cat.id === 'all');
-  };
-
-  const categories = categorizeDocuments();
-
-  const toggleCategory = (categoryId: string) => {
-    const newExpanded = new Set(expandedCategories);
-    if (newExpanded.has(categoryId)) {
-      newExpanded.delete(categoryId);
-    } else {
-      newExpanded.add(categoryId);
-    }
-    setExpandedCategories(newExpanded);
-  };
-
-  const handleDeleteDocument = async (filename: string) => {
+  const handleDeleteDocument = async (filename) => {
     if (!confirm(`确定要删除 "${filename}" 吗？`)) {
       return;
     }
 
     try {
       await apiRequest("DELETE", `/api/documents/${filename}`, {});
-      queryClient.invalidateQueries({ queryKey: [`${getApiBaseUrl()}/api/documents`] });
-      queryClient.invalidateQueries({ queryKey: [`${getApiBaseUrl()}/api/vector_store_size`] });
+      queryClient.invalidateQueries({
+        queryKey: [`${getApiBaseUrl()}/api/documents`],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [`${getApiBaseUrl()}/api/vector_store_size`],
+      });
       toast({
         title: "文档已删除",
-        description: `${filename} 已从知识库中移除。`
+        description: `${filename} 已从知识库中移除。`,
       });
     } catch (error) {
       toast({
         title: "删除失败",
         description: "无法删除文档。请重试。",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
 
   return (
-    <aside className="w-80 bg-white border-r border-[#202020]/10 flex flex-col flex-shrink-0">
+    <div className="h-full flex flex-col bg-[#f7f7f4]">
       {/* Header */}
-      <div className="p-4 border-b border-[#202020]/10">
-        <div className="mb-4">
-          <Button
-            className="w-full bg-[#202020] hover:bg-[#202020]/90 text-[#fcfcfc] mb-3"
-            onClick={handleUploadClick}
-            disabled={isUploading}
-          >
-            {isUploading ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                上传中...
-              </>
-            ) : (
-              <>
-                <Upload className="h-4 w-4 mr-2" />
-                上传文档
-              </>
-            )}
-          </Button>
-        </div>
+      <div className="p-5 border-b border-[#e6e5e0]">
+        <Button
+          className="w-full bg-[#f54e00] hover:bg-[#d04200] text-white rounded-lg h-10 px-4 text-sm font-medium transition-colors mb-4"
+          onClick={handleUploadClick}
+          disabled={isUploading}
+        >
+          {isUploading ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              上传中...
+            </>
+          ) : (
+            <>
+              <Upload className="w-4 h-4 mr-2" />
+              上传文档
+            </>
+          )}
+        </Button>
 
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#8d8d8d]" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#807d72]" />
           <Input
             placeholder="搜索文档..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 text-sm"
+            className="pl-10 text-sm bg-white border border-[#e6e5e0] rounded-lg h-10 focus-visible:ring-1 focus-visible:ring-[#f54e00] focus-visible:border-[#f54e00] text-[#262520] placeholder:text-[#807d72]"
           />
         </div>
       </div>
 
-      {/* Document categories */}
-      <div className="flex-1 overflow-y-auto">
+      {/* Documents List */}
+      <div className="flex-1 overflow-y-auto p-4">
+        <div className="mb-2">
+          <h3 className="text-xs font-medium text-[#807d72] uppercase tracking-wider">
+            文档库 ({filteredDocuments.length})
+          </h3>
+        </div>
         <div className="space-y-1">
-          {categories.map((category) => (
-            <div key={category.id}>
-              <button
-                onClick={() => toggleCategory(category.id)}
-                className="w-full flex items-center gap-2 px-4 py-2 text-left hover:bg-[#202020]/5 transition-colors"
+          {filteredDocuments.length === 0 ? (
+            <div className="text-center py-8">
+              <FileText className="w-10 h-10 text-[#807d72] mx-auto mb-3 opacity-50" />
+              <p className="text-xs text-[#807d72]">
+                {searchQuery ? "没有找到匹配的文档" : "暂无文档"}
+              </p>
+            </div>
+          ) : (
+            filteredDocuments.map((doc) => (
+              <div
+                key={doc.filename}
+                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg cursor-pointer transition-all group ${
+                  selectedFile?.filename === doc.filename
+                    ? "bg-[#f54e00]/10 border border-[#f54e00]/20"
+                    : "hover:bg-[#e6e5e0]/50 border border-transparent"
+                }`}
+                onClick={() => onFileSelect(doc)}
               >
-                {expandedCategories.has(category.id) ? (
-                  <ChevronDown className="h-4 w-4 text-[#646464]" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-[#646464]" />
-                )}
-                {category.icon}
-                <span className="text-sm font-medium text-[#202020]">{category.name}</span>
-                {category.documents.length > 0 && (
-                  <span className="text-xs text-[#8d8d8d] ml-auto">
-                    {category.documents.length}
-                  </span>
-                )}
-              </button>
-
-              {expandedCategories.has(category.id) && (
-                <div className="ml-6 space-y-1">
-                  {category.documents.length === 0 ? (
-                    <div className="text-center py-4">
-                      <p className="text-xs text-[#8d8d8d]">
-                        {searchQuery ? "没有找到匹配的文档" : "暂无文档"}
-                      </p>
-                    </div>
-                  ) : (
-                    category.documents.map((doc) => (
-                      <div
-                        key={doc.filename}
-                        className={`flex items-center gap-2 px-4 py-2 hover:bg-[#202020]/5 rounded-full group cursor-pointer transition-colors ${
-                          selectedFile?.filename === doc.filename ? 'bg-[#ea2804]/5 border-l-4 border-[#ea2804]' : ''
-                        }`}
-                        onClick={() => onFileSelect?.(doc)}
-                      >
-                        <File className="h-4 w-4 text-[#8d8d8d] flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className={`text-sm truncate ${
-                            selectedFile?.filename === doc.filename ? 'text-[#ea2804] font-medium' : 'text-[#202020]'
-                          }`}>
-                            {doc.filename}
-                          </p>
-                          <p className="text-xs text-[#8d8d8d]">
-                            {(doc.file_size / 1024 / 1024).toFixed(1)}MB
-                          </p>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteDocument(doc.filename);
-                          }}
-                          className="opacity-0 group-hover:opacity-100 text-[#ea2804] hover:text-[#ea2804] hover:bg-[#ea2804]/10 p-1 h-auto transition-opacity"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    ))
+                <File className="w-4 h-4 flex-shrink-0 text-[#807d72]" />
+                <div className="flex-1 min-w-0">
+                  <p
+                    className={`text-sm truncate ${
+                      selectedFile?.filename === doc.filename
+                        ? "text-[#f54e00] font-medium"
+                        : "text-[#262520]"
+                    }`}
+                  >
+                    {doc.filename}
+                  </p>
+                  {doc.file_size && (
+                    <p className="text-xs text-[#807d72]">
+                      {(doc.file_size / 1024 / 1024).toFixed(1)} MB
+                    </p>
                   )}
                 </div>
-              )}
-            </div>
-          ))}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteDocument(doc.filename);
+                  }}
+                  className="opacity-0 group-hover:opacity-100 text-[#807d72] hover:text-[#f54e00] hover:bg-[#f54e00]/10 p-1.5 h-auto transition-opacity rounded-md"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </Button>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
-      {/* Footer actions */}
-      <div className="p-4 border-t border-[#202020]/10">
+      {/* Footer */}
+      <div className="p-4 border-t border-[#e6e5e0]">
         <div className="flex gap-2">
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={refreshIndex}
             disabled={isRefreshing}
-            className="flex-1"
+            className="flex-1 bg-white border border-[#e6e5e0] hover:bg-[#e6e5e0]/50 hover:border-[#e6e5e0] text-[#262520] rounded-lg h-9"
           >
-            {isRefreshing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            {isRefreshing ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <RefreshCw className="w-4 h-4" />
+            )}
           </Button>
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={clearKnowledgeBase}
-            disabled={isClearing || totalDocuments === 0}
-            className="flex-1"
+            disabled={isClearing || documents.length === 0}
+            className="flex-1 bg-white border border-[#e6e5e0] hover:bg-[#e6e5e0]/50 hover:border-[#e6e5e0] text-[#262520] rounded-lg h-9"
           >
-            {isClearing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+            {isClearing ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Trash2 className="w-4 h-4" />
+            )}
           </Button>
         </div>
       </div>
-    </aside>
+    </div>
   );
 }

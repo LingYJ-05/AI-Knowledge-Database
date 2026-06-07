@@ -24,12 +24,12 @@ router = APIRouter(prefix="/auth", tags=["认证"])
 class EmailLoginRequest(BaseModel):
     """邮箱登录请求"""
 
-    email: EmailStr
+    email: EmailStr 
     password: str
 
 
 @router.post("/register", response_model=UserResponse)
-async def register(user_data: UserCreate, db: Session = Depends(get_db)):
+def register(user_data: UserCreate, db: Session = Depends(get_db)):
     """用户注册"""
     auth_service = AuthService(db)
 
@@ -46,7 +46,7 @@ async def register(user_data: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=Token)
-async def login(user_data: UserLogin, db: Session = Depends(get_db)):
+def login(user_data: UserLogin, db: Session = Depends(get_db)):
     """用户登录"""
     print(f"[DEBUG] 接收到登录请求: {user_data}")
     auth_service = AuthService(db)

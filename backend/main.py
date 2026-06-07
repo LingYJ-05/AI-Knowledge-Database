@@ -149,10 +149,10 @@ async def health_check():
 if __name__ == "__main__":
     # 从环境变量获取端口，如果未设置则默认为 8000
     # Uvicorn 的 --port 参数会覆盖这里的 host 和 port
-    port = int(os.getenv("BACKEND_PORT", "8004"))
+    port = int(os.getenv("BACKEND_PORT", "3004"))
     host = os.getenv("BACKEND_HOST", "0.0.0.0")  # 默认监听所有网络接口，确保外部可访问
 
     print(f"准备在 {host}:{port} 启动 Uvicorn 服务器...")
     uvicorn.run(
-        "main:app", host=host, port=port, reload=False, app_dir=".", loop="uvloop"
+        "main:app", host=host, port=port, reload=False, app_dir="."
     )
